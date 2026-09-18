@@ -1,0 +1,48 @@
+mode:
+  id: stack
+  name: "Stack & Repo Discovery"
+  description: "Encontra repos clonáveis, tutoriais, atalhos. Pra construir rápido."
+vault_load:
+  scopes: [wiki/projects/, wiki/concepts/]
+  exclude: [wiki/_state/, wiki/notes/, raw/]
+  max_pages: 3
+  rank_by: keyword_density
+decompose:
+  sub_query_count: [5, 7]
+  required_angles: [open-source-options, tutorial-quality, similar-products, license-watchout, recent-soa]
+  ultrathink: true
+search:
+  workers: 5
+  sources_priority:
+    - "github.com/trending"
+    - "github.com/*/awesome-*"
+    - "github.com"
+    - "youtube.com"
+    - "dev.to"
+    - "hashnode.com"
+    - "producthunt.com"
+  sources_boost:
+    "github.com": 1.3
+    "youtube.com": 1.1
+  sources_block: [pinterest.com, medium.com]
+  prefer_tools: [exa, websearch]
+  max_deep_reads_per_worker: 3
+evaluate:
+  min_coverage_to_stop: 65
+  min_high_credibility_sources: 3
+  mode_specific_checks:
+    - rule: "min 3 GitHub repos com >100 stars"
+      on_fail: continue_with_repo_focus_queries
+synthesize:
+  prompt_file: synthesize-stack.md
+  required_sections: [tldr, architecture_options, ranked_repos, tutorials, effort_estimate, risks]
+applied_lens:
+  universal_sections: [vault_context, money_angle, next_actions]
+  mode_specific_sections: [stack_shortlist]
+  money_angle_dimensions: 5
+document:
+  output_dir: wiki/research/
+  index_section: "## Research"
+  log_entry_template: "research-stack | {topic} | repos: {repo_count}"
+  frontmatter_extras:
+    research_mode: stack

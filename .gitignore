@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.*
+!.env.example
+outputs/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# dados pessoais que as skills geram
+skills/emitir-nfse/nfse.config.json
+skills/emitir-nfse/references/tomadores.md
+skills/ig-competitor-research/data/competitors/*.txt
+!skills/ig-competitor-research/data/competitors/exemplo.txt

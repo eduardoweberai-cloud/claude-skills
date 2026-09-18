@@ -1,0 +1,39 @@
+# Mode template — copy this file, rename, edit. Filename = mode id.
+mode:
+  id: <slug>
+  name: <human-readable>
+  description: <when to use>
+  default: false
+vault_load:
+  scopes: [wiki/concepts/, wiki/projects/, wiki/clients/, wiki/_refs/]
+  exclude: [wiki/_state/, wiki/notes/, raw/]
+  max_pages: 5
+  rank_by: keyword_density
+decompose:
+  sub_query_count: [5, 7]
+  required_angles: [expert, devils-advocate, implementation]
+  ultrathink: true
+search:
+  workers: 5
+  sources_priority: []
+  sources_boost: {}
+  sources_block: [pinterest.com, quora.com]
+  prefer_tools: [exa, websearch]
+  max_deep_reads_per_worker: 3
+evaluate:
+  min_coverage_to_stop: 65
+  min_high_credibility_sources: 3
+  mode_specific_checks: []
+synthesize:
+  prompt_file: synthesize-<mode>.md
+  required_sections: [tldr, key_findings, sources]
+  optional_sections: []
+applied_lens:
+  universal_sections: [vault_context, money_angle, next_actions]
+  mode_specific_sections: []
+  money_angle_dimensions: 5
+document:
+  output_dir: wiki/research/
+  index_section: "## Research"
+  log_entry_template: "research | {mode} | {topic} | linked: {links}"
+  frontmatter_extras: {}

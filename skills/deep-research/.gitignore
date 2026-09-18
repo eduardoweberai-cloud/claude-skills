@@ -1,0 +1,8 @@
+node_modules/
+*.log
+.deep-research-debug.log
+.index.lock
+*.bak
+_partial-*.md
+.research-bootstrap.bak
+research-dashboard-usage.md

@@ -1,0 +1,21 @@
+{
+  "name": "deep-research",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "Deep mode-specialized research skill for Claude Code. Memory Vault integration + applied lens (money angle, next actions, vault auto-link).",
+  "scripts": {
+    "test": "node --test \"tests/**/*.test.js\"",
+    "test:watch": "node --test --watch \"tests/**/*.test.js\"",
+    "bootstrap": "node scripts/bootstrap.js",
+    "smoke:deep": "echo 'Manual: /deep-research estado da arte de agentes autonomos 2026'",
+    "smoke:stack": "echo 'Manual: /deep-research stack saas multi-tenant boilerplate next.js supabase 2026'",
+    "smoke:nfse": "echo 'Manual: /deep-research automation como automatizar emissao NFS-e 100% via Claude Code'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  }
+}

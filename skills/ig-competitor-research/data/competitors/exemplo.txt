@@ -1,0 +1,4 @@
+# Um @handle por linha. Linhas com # são comentário.
+# Troque pelos perfis do seu nicho.
+@perfil_concorrente_1
+@perfil_concorrente_2

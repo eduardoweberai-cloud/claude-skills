@@ -1,0 +1,30 @@
+{
+  "_leia": "Copie para nfse.config.json e troque TODOS os valores. Os campos fiscais precisam ser validados pelo seu contador.",
+  "prestador": {
+    "razao_social": "SUA EMPRESA LTDA",
+    "cnpj": "00000000000000",
+    "municipio_busca": "Nome da sua cidade",
+    "municipio_codigo_esperado": "0000000"
+  },
+  "servico": {
+    "codigo_tributacao_busca": "0000",
+    "codigo_tributacao_esperado": "00.00.00",
+    "descricao": "Serviços prestados",
+    "nbs": "000000000"
+  },
+  "tributacao": {
+    "preencher_ibs_cbs": false,
+    "regime_apuracao_value": "1",
+    "issqn_retido_pelo_tomador": false,
+    "tipo_valor_tributos_value": "1",
+    "tributos_aproximados": { "federal": "0,00", "estadual": "0,00", "municipal": "0,00" },
+    "pis_cofins_situacao_value": "1",
+    "pis_cofins_retencao_value": "0"
+  },
+  "pastas": {
+    "notas": "~/Downloads/NFSE"
+  },
+  "cofre": {
+    "arquivo": "~/.nfse/prestador.sec"
+  }
+}

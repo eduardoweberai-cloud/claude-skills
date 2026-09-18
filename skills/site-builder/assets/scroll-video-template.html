@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scroll-Video Template</title>
+<!--
+  TEMPLATE BASE do modo cinematográfico (site-builder, Fase 5c).
+  Substituir: FRAME_COUNT, FRAME_PATH, as zonas narrativas e o conteúdo dos overlays.
+  Frames gerados via: ffmpeg -i video.mp4 -vf "fps=12,scale=1920:-2" -q:v 3 frames/frame_%04d.jpg
+-->
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { background: #000; color: #fff; font-family: system-ui, sans-serif; }
+
+  #loader { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 50; transition: opacity .6s; font-variant-numeric: tabular-nums; letter-spacing: .2em; }
+  #loader.done { opacity: 0; pointer-events: none; }
+
+  /* Container alto define a "duração" do scroll; canvas fica preso na viewport */
+  #cine { height: 500vh; position: relative; }
+  #cine canvas { position: sticky; top: 0; width: 100%; height: 100vh; display: block; object-fit: cover; }
+
+  /* Overlays narrativos: uma camada por zona, controlada por .active */
+  .zone { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; opacity: 0; transform: translateY(24px); transition: opacity .8s, transform .8s; pointer-events: none; padding: 2rem; }
+  .zone.active { opacity: 1; transform: none; }
+  .zone h2 { font-size: clamp(2.5rem, 8vw, 7rem); font-weight: 800; line-height: .95; }
+  .zone p { margin-top: 1rem; max-width: 40ch; opacity: .75; }
+
+  /* Indicador lateral de progresso temático */
+  #progress { position: fixed; right: 1.5rem; top: 50%; transform: translateY(-50%); width: 2px; height: 40vh; background: rgba(255,255,255,.15); }
+  #progress i { position: absolute; top: 0; left: 0; width: 100%; height: 0%; background: #fff; }
+
+  /* Conteúdo normal do site continua depois do bloco cinematográfico */
+  section.static { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #cine { height: 100vh; }
+    .zone { position: absolute; opacity: 1; transform: none; }
+    #progress { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loader"><span id="loadpct">0%</span></div>
+
+<div id="cine">
+  <canvas id="cv"></canvas>
+</div>
+
+<!-- Zonas narrativas: mapear para faixas de progresso no JS -->
+<div class="zone" data-zone="0"><h2>ZONA 1</h2><p>Headline da abertura. Fato concreto do lore aqui.</p></div>
+<div class="zone" data-zone="1"><h2>ZONA 2</h2><p>Segundo movimento da narrativa.</p></div>
+<div class="zone" data-zone="2"><h2>ZONA 3</h2><p>Clímax / CTA.</p></div>
+
+<div id="progress"><i></i></div>
+
+<section class="static"><h2>Conteúdo normal do site continua aqui</h2></section>
+
+<script>
+(function () {
+  var FRAME_COUNT = 60;                       // total de frames gerados
+  var FRAME_PATH = function (i) {             // caminho dos frames (%04d)
+    return 'frames/frame_' + String(i + 1).padStart(4, '0') + '.webp';
+  };
+  // Faixas de progresso [início, fim) de cada zona narrativa
+  var ZONES = [[0.00, 0.33], [0.33, 0.66], [0.66, 1.01]];
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canvas = document.getElementById('cv');
+  var ctx = canvas.getContext('2d');
+  var cine = document.getElementById('cine');
+  var loader = document.getElementById('loader');
+  var loadpct = document.getElementById('loadpct');
+  var bar = document.querySelector('#progress i');
+  var zones = [].slice.call(document.querySelectorAll('.zone'));
+  var frames = [], loaded = 0, current = -1;
+
+  function draw(i) {
+    var img = frames[i];
+    if (!img || !img.complete) return;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    // cover: preencher viewport mantendo proporção
+    var s = Math.max(canvas.width / img.width, canvas.height / img.height);
+    var w = img.width * s, h = img.height * s;
+    ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+  }
+
+  function onScroll() {
+    var rect = cine.getBoundingClientRect();
+    var total = cine.offsetHeight - window.innerHeight;
+    var progress = Math.min(1, Math.max(0, -rect.top / total));
+    var idx = Math.min(FRAME_COUNT - 1, Math.floor(progress * FRAME_COUNT));
+    if (idx !== current) { current = idx; requestAnimationFrame(function () { draw(idx); }); }
+    bar.style.height = (progress * 100) + '%';
+    zones.forEach(function (z, i) {
+      var inRange = progress >= ZONES[i][0] && progress < ZONES[i][1] && rect.bottom > window.innerHeight;
+      z.classList.toggle('active', inRange);
+    });
+  }
+
+  if (reduced) {
+    // Sem motion: frame único estático, zonas visíveis em fluxo
+    var img = new Image();
+    img.onload = function () { frames[0] = img; draw(0); };
+    img.src = FRAME_PATH(0);
+    loader.classList.add('done');
+    return;
+  }
+
+  for (var i = 0; i < FRAME_COUNT; i++) {
+    (function (i) {
+      var img = new Image();
+      img.onload = img.onerror = function () {
+        loaded++;
+        loadpct.textContent = Math.round(loaded / FRAME_COUNT * 100) + '%';
+        if (loaded === FRAME_COUNT) {
+          loader.classList.add('done');
+          draw(0); onScroll();
+        }
+      };
+      img.src = FRAME_PATH(i);
+      frames[i] = img;
+    })(i);
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', function () { current = -1; onScroll(); });
+})();
+</script>
+</body>
+</html>
